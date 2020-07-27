@@ -5,6 +5,7 @@ use Kirby\Cms\Asset;
 use Kirby\Cms\Html;
 use Kirby\Cms\Response;
 use Kirby\Cms\Url;
+use Kirby\Http\Router;
 use Kirby\Toolkit\Escape;
 use Kirby\Toolkit\F;
 use Kirby\Toolkit\I18n;
@@ -605,7 +606,22 @@ function r($condition, $value, $alternative = null)
 }
 
 /**
- * Returns the current site object
+ * Create a micro-router
+ * and execute the routing action
+ * immediately
+ *
+ * @param string $path
+ * @param string $method
+ * @param array $routes
+ * @return void
+ */
+function router(string $path = null, string $method = 'GET', array $routes = [])
+{
+    return (new Router($routes))->call($path, $method);
+}
+
+/**
+ * Returns the currrent site object
  *
  * @return \Kirby\Cms\Site
  */
