@@ -1,48 +1,69 @@
 <template>
-  <k-error-view v-if="issue">
-    {{ issue.message }}
-  </k-error-view>
-
-  <div v-else-if="ready" :data-locked="isLocked" class="k-user-view">
-    <div class="k-user-profile">
-      <k-view>
-        <template v-if="avatar">
-          <k-dropdown>
+  <k-inside>
+    <div :data-locked="isLocked" class="k-user-view">
+      <div class="k-user-profile">
+        <k-view>
+          <template v-if="user.avatar">
+            <k-dropdown>
+              <k-button
+                :tooltip="$t('avatar')"
+                :disabled="isLocked"
+                class="k-user-view-image"
+                @click="$refs.picture.toggle()"
+              >
+                <k-image
+                  v-if="user.avatar"
+                  :cover="true"
+                  :src="user.avatar"
+                  ratio="1/1"
+                />
+              </k-button>
+              <k-dropdown-content ref="picture">
+                <k-dropdown-item icon="upload" @click="$refs.upload.open()">
+                  {{ $t('change') }}
+                </k-dropdown-item>
+                <k-dropdown-item icon="trash" @click="action('picture.delete')">
+                  {{ $t('delete') }}
+                </k-dropdown-item>
+              </k-dropdown-content>
+            </k-dropdown>
+          </template>
+          <template v-else>
             <k-button
               :tooltip="$t('avatar')"
-              :disabled="isLocked"
               class="k-user-view-image"
-              @click="$refs.picture.toggle()"
+              @click="$refs.upload.open()"
             >
-              <k-image
-                v-if="avatar"
-                :cover="true"
-                :src="avatar"
-                ratio="1/1"
-              />
+              <k-icon type="user" />
             </k-button>
-            <k-dropdown-content ref="picture">
-              <k-dropdown-item icon="upload" @click="$refs.upload.open()">
-                {{ $t('change') }}
-              </k-dropdown-item>
-              <k-dropdown-item icon="trash" @click="action('picture.delete')">
-                {{ $t('delete') }}
-              </k-dropdown-item>
-            </k-dropdown-content>
-          </k-dropdown>
-        </template>
-        <template v-else>
-          <k-button :tooltip="$t('avatar')" class="k-user-view-image" @click="$refs.upload.open()">
-            <k-icon type="user" />
-          </k-button>
-        </template>
+          </template>
 
-        <k-button-group>
-          <k-button :disabled="!permissions.changeEmail || isLocked" icon="email" @click="action('email')">{{ $t("email") }}: {{ user.email }}</k-button>
-          <k-button :disabled="!permissions.changeRole || isLocked" icon="bolt" @click="action('role')">{{ $t("role") }}: {{ user.role.title }}</k-button>
-          <k-button :disabled="!permissions.changeLanguage || isLocked" icon="globe" @click="action('language')">{{ $t("language") }}: {{ user.language }}</k-button>
-        </k-button-group>
-      </k-view>
+          <k-button-group>
+            <k-button
+              :disabled="!permissions.changeEmail || isLocked"
+              icon="email"
+              @click="action('email')"
+            >
+              {{ $t("email") }}: {{ user.email }}
+            </k-button>
+            <k-button
+              :disabled="!permissions.changeRole || isLocked"
+              icon="bolt"
+              @click="action('role')"
+            >
+              {{ $t("role") }}: {{ user.role }}
+            </k-button>
+            <k-button
+              :disabled="!permissions.changeLanguage || isLocked"
+              icon="globe"
+              @click="action('language')"
+            >
+              {{ $t("language") }}: {{ user.language }}
+            </k-button>
+          </k-button-group>
+        </k-view>
+      </div>
+
     </div>
 
     <k-view>
@@ -67,7 +88,7 @@
         </k-button-group>
 
         <k-prev-next
-          v-if="user.id && $route.name === 'User'"
+          v-if="$options.prevnext"
           slot="right"
           :prev="prev"
           :next="next"
@@ -75,108 +96,69 @@
       </k-header>
 
       <k-sections
-        v-if="user"
-        :blueprint="user.blueprint.name"
+        v-if="tab.columns"
+        :blueprint="blueprint"
         :empty="$t('user.blueprint', { role: user.role.name })"
+        :columns="tab.columns"
         :parent="'users/' + user.id"
         :tab="tab"
         :tabs="tabs"
       />
-
-      <k-user-email-dialog ref="email" @success="fetch" />
-      <k-user-language-dialog ref="language" @success="fetch" />
-      <k-user-password-dialog ref="password" />
-      <k-user-remove-dialog ref="remove" />
-      <k-user-rename-dialog ref="rename" @success="fetch" />
-      <k-user-role-dialog ref="role" @success="fetch" />
-
-      <k-upload
-        ref="upload"
-        :url="uploadApi"
-        :multiple="false"
-        accept="image/*"
-        @success="uploadedAvatar"
+      <k-box
+        v-else
+        :text="$t('user.blueprint', { role: user.role.name })"
+        theme="info"
       />
     </k-view>
-  </div>
 
+    <k-user-email-dialog ref="email" @success="$reload" />
+    <k-user-language-dialog ref="language" @success="$reload" />
+    <k-user-password-dialog ref="password" />
+    <k-user-remove-dialog ref="remove" @success="$go('users')" />
+    <k-user-rename-dialog ref="rename" @success="$reload" />
+    <k-user-role-dialog ref="role" @success="$reload" />
+
+    <k-upload
+      ref="upload"
+      :url="uploadApi"
+      :multiple="false"
+      accept="image/*"
+      @success="uploadedAvatar"
+    />
+
+  </k-inside>
 </template>
 
 <script>
-import PrevNext from "@/mixins/view/prevnext.js";
-import config from "@/config/config.js";
+import ModelView from "./ModelView";
 
 export default {
-  mixins: [PrevNext],
+  extends: ModelView,
+  prevnext: true,
   props: {
-    id: {
-      type: [Boolean, String],
-      required: true
-    },
-    tab: String
-  },
-  data() {
-    return {
-      tabs: [],
-      ready: false,
-      user: {
-        role: {
-          name: null
-        },
-        name: null,
-        language: null,
-        prev: null,
-        next: null
-      },
-      permissions: {
-        changeEmail: true,
-        changeName: true,
-        changeLanguage: true,
-        changeRole: true
-      },
-      issue: null,
-      avatar: null,
-      options: null
-    };
+    user: Object
   },
   computed: {
-    language() {
-      return this.$store.state.languages.current;
-    },
-    next() {
-      if (this.user.next) {
-        return {
-          link: this.$api.users.link(this.user.next.id),
-          tooltip: this.user.next.name
-        };
-      }
-    },
-    prev() {
-      if (this.user.prev) {
-        return {
-          link: this.$api.users.link(this.user.prev.id),
-          tooltip: this.user.prev.name
-        };
-      }
+    options() {
+      return async ready => {
+        const options = await this.$api.users.options(this.user.id);
+        ready(options);
+      };
     },
     uploadApi() {
-      return config.api + "/users/" + this.user.id + "/avatar";
+      return this.$urls.api + "/users/" + this.user.id + "/avatar";
     }
   },
   watch: {
-    "$route.name": {
-      handler(name) {
-        if (name === "Account") {
-          this.$store.dispatch("breadcrumb", []);
-        }
+    "user.id": {
+      handler() {
+        this.$store.dispatch("content/create", {
+          id: "users/" + this.user.id,
+          api: this.$api.users.link(this.user.id),
+          content: this.user.content
+        });
       },
       immediate: true
-    },
-    language() {
-      this.fetch();
-    },
-    id() {
-      this.fetch();
     }
   },
   methods: {
@@ -195,6 +177,7 @@ export default {
           await this.$api.users.deleteAvatar(this.id)
           this.avatar = null;
           this.$store.dispatch("notification/success", ":)");
+          this.$reload();
           break;
         case "remove":
           this.$refs.remove.open(this.user.id);
@@ -209,50 +192,9 @@ export default {
           this.$store.dispatch("notification/error", "Not yet implemented");
       }
     },
-    async fetch() {
-      // don't load a user if there's no id
-      if (!this.id) {
-        return;
-      }
-
-      try {
-        this.user = await this.$api.users.get(this.id, { view: "panel" });
-        this.tabs = this.user.blueprint.tabs;
-        this.ready = true;
-        this.permissions = this.user.options;
-        this.options = async ready => {
-          const options = await this.$api.users.options(this.user.id);
-          ready(options);
-        };
-
-        if (this.user.avatar) {
-          this.avatar = this.user.avatar.url;
-        } else {
-          this.avatar = null;
-        }
-
-        if (this.$route.name === "User") {
-          this.$store.dispatch(
-            "breadcrumb",
-            this.$api.users.breadcrumb(this.user)
-          );
-        }
-
-        this.$store.dispatch("title", this.user.name || this.user.email);
-        this.$store.dispatch("content/create", {
-          id: "users/" + this.user.id,
-          api: this.$api.users.link(this.user.id),
-          content: this.user.content
-        });
-
-      } catch (error) {
-        window.console.error(error);
-        this.issue = error;
-      }
-    },
     uploadedAvatar() {
       this.$store.dispatch("notification/success", ":)");
-      this.fetch();
+      this.$reload();
     }
   }
 };
