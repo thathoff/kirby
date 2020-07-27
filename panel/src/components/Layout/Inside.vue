@@ -1,108 +1,48 @@
 <template>
   <div
-    v-if="!$store.state.system.info.isBroken"
     :data-dragging="$store.state.drag"
     :data-loading="$store.state.isLoading"
-    :data-topbar="inside"
     :data-dialog="$store.state.dialog"
-    :data-translation="translation"
-    :data-translation-default="defaultTranslation"
-    class="k-panel"
+    :dir="$translation.direction"
+    class="k-panel k-panel-inside"
   >
-    <!-- Icons -->
-    <keep-alive>
-      <k-icons />
-    </keep-alive>
-
-    <!-- Header -->
-    <header v-if="inside" class="k-panel-header">
+    <header class="k-panel-header">
       <k-topbar
+        :breadcrumb="$view.breadcrumb"
+        :license="$system.license"
+        :views="$views"
+        :view="$view"
         @register="$refs.registration.open()"
-        @search="$refs.search.open();"
       />
+      <k-search v-if="$store.state.search" v-bind="$store.state.search" />
     </header>
 
     <!-- Main view -->
     <main class="k-panel-view">
-      <router-view />
+      <slot />
     </main>
-
-    <!-- Form buttons -->
-    <k-form-buttons v-if="inside" />
-
-    <!-- Search dialog -->
-    <k-search
-      v-if="inside"
-      ref="search"
-      :type="searchType"
-      :types="searchTypes"
-    />
-
-    <!-- Error dialog -->
+    <k-form-buttons />
+    <k-registration ref="registration" @success="$reload" />
     <k-error-dialog />
-
-    <!-- Offline warning -->
-    <div
-      v-if="offline"
-      class="k-offline-warning"
-    >
+    <div v-if="offline" class="k-offline-warning">
       <p>The Panel is currently offline</p>
     </div>
-
-    <!-- Registration dialog -->
-    <k-registration v-if="inside" ref="registration" />
-  </div>
-  <div v-else class="k-panel">
-    <main class="k-panel-view">
-      <k-error-view>
-        <p v-if="debug">
-          {{ $store.state.system.info.error }}
-        </p>
-        <p v-else>
-          The Panel cannot connect to the API
-        </p>
-      </k-error-view>
-    </main>
   </div>
 </template>
 
 <script>
-import Icons from "@/components/Misc/Icons.vue";
 import Registration from "@/components/Dialogs/RegistrationDialog.vue";
-import config from "@/config/config.js";
-import search from "@/config/search.js"
 
 export default {
-  name: "App",
+  inheritAttrs: false,
   components: {
-    "k-icons": Icons,
-    "k-registration": Registration,
+    "k-registration": Registration
   },
   data() {
     return {
       offline: false,
       dragging: false,
-      debug: config.debug
     };
-  },
-  computed: {
-    inside() {
-      return !this.$route.meta.outside && this.$store.state.user.current
-        ? true
-        : false;
-    },
-    defaultTranslation() {
-      return this.$store.state.languages.current ? this.$store.state.languages.current === this.$store.state.languages.default : false;
-    },
-    searchType() {
-      return this.$store.state.view === 'users' ? 'users' : 'pages';
-    },
-    searchTypes() {
-      return search(this);
-    },
-    translation() {
-      return this.$store.state.languages.current ? this.$store.state.languages.current.code : false;
-    }
   },
   created() {
     this.$events.$on("offline", this.isOffline);
@@ -125,7 +65,7 @@ export default {
       this.offline = false;
     },
     isOffline() {
-      if (this.$store.state.system.info.isLocal === false) {
+      if (this.$system.isLocal === false) {
         this.offline = true;
       }
     }
@@ -263,7 +203,7 @@ b {
   overflow: hidden;
   transform: none;
 }
-.k-panel[data-topbar] .k-panel-view {
+.k-panel-inside .k-panel-view {
   top: 2.5rem;
 }
 .k-panel[data-loading]::after,
