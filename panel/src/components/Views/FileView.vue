@@ -50,14 +50,14 @@
           :tabs="tabs"
         />
 
-        <k-file-rename-dialog ref="rename" @success="onRenamed" />
-        <k-file-remove-dialog ref="remove" @success="onDeleted" />
+        <k-file-rename-dialog ref="rename" @success="onRename" />
+        <k-file-remove-dialog ref="remove" @success="onDelete" />
         <k-upload
           ref="upload"
           :url="uploadApi"
           :accept="file.mime"
           :multiple="false"
-          @success="onUploaded"
+          @success="onUpload"
         />
       </k-view>
     </div>
@@ -115,17 +115,19 @@ export default {
           break;
       }
     },
-    onDeleted() {
+    onDelete() {
       if (this.file.parent) {
         this.$go('/' + this.file.parent);
       } else {
         this.$go('/site');
       }
     },
-    onRenamed(file) {
-      this.$go(this.$api.files.link(this.file.parent, file.filename));
+    onRename(file) {
+      if (file.filename !== this.file.filename) {
+        this.$go(this.$api.files.link(this.file.parent, file.filename));
+      }
     },
-    onUploaded() {
+    onUpload() {
       this.$store.dispatch("notification/success", ":)");
       this.$reload();
     }

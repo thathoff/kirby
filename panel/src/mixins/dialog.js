@@ -41,7 +41,7 @@ export default {
         }
 
         payload.event.forEach(event => {
-          this.$events.$emit(event);
+          this.$events.$emit(event, payload);
         })
       }
 
