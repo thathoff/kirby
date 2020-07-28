@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@linusborg/vue-simple-portal": "^0.1.4",
+    "@inertiajs/inertia": "npm:inertia-light@0.1.11",
+    "@inertiajs/inertia-vue": "^0.1.4",
     "autosize": "^4.0.2",
     "dayjs": "^1.8.22",
     "npm": "^6.14.7",
