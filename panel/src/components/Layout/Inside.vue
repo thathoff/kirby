@@ -13,8 +13,8 @@
         :views="$views"
         :view="$view"
         @register="$refs.registration.open()"
+        @search="$refs.search.open()"
       />
-      <k-search v-if="$store.state.search" v-bind="$store.state.search" />
     </header>
 
     <!-- Main view -->
@@ -23,6 +23,7 @@
     </main>
     <k-form-buttons />
     <k-registration ref="registration" @success="$reload" />
+    <k-search :type="$view.search" :types="searchTypes" ref="search" />
     <k-error-dialog />
     <div v-if="offline" class="k-offline-warning">
       <p>The Panel is currently offline</p>
@@ -31,6 +32,7 @@
 </template>
 
 <script>
+import search from "@/config/search.js"
 import Registration from "@/components/Dialogs/RegistrationDialog.vue";
 
 export default {
@@ -43,6 +45,11 @@ export default {
       offline: false,
       dragging: false,
     };
+  },
+  computed: {
+    searchTypes() {
+      return search(this);
+    }
   },
   created() {
     this.$events.$on("offline", this.isOffline);

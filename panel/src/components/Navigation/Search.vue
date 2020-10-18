@@ -93,7 +93,8 @@ export default {
       default() {
         return {};
       }
-    }
+    },
+    type: String
   },
   data() {
     return {
@@ -103,11 +104,6 @@ export default {
       currentType: this.getType(this.type),
       q: null,
       selected: -1,
-    }
-  },
-  computed: {
-    type() {
-      return this.$view.search;
     }
   },
   watch: {
@@ -189,7 +185,7 @@ export default {
 
         this.items = await this.currentType.search({
           query: query,
-          limit: config.search.limit
+          limit: this.$config.search.limit
         });
 
 
