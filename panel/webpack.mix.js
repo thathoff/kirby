@@ -32,7 +32,7 @@ mix.webpackConfig({
 });
 
 mix.extract();
-mix.js("src/index.js", "dist/");
+mix.js("src/index.js", "dist/").sourceMaps();
 
 if (inProduction) {
 
