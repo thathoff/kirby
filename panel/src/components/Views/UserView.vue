@@ -70,7 +70,7 @@
 
       <k-header
         :editable="permissions.changeName && !isLocked"
-        :tab="tab"
+        :tab="tab.name"
         :tabs="tabs"
         @edit="action('rename')"
       >
@@ -96,18 +96,10 @@
       </k-header>
 
       <k-sections
-        v-if="tab.columns"
         :blueprint="blueprint"
         :empty="$t('user.blueprint', { role: user.role.name })"
-        :columns="tab.columns"
         :parent="'users/' + user.id"
         :tab="tab"
-        :tabs="tabs"
-      />
-      <k-box
-        v-else
-        :text="$t('user.blueprint', { role: user.role.name })"
-        theme="info"
       />
     </k-view>
 

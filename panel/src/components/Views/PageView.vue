@@ -3,8 +3,8 @@
     <k-view :data-locked="isLocked" class="k-page-view">
 
       <k-header
+        :tab="tab.name"
         :tabs="tabs"
-        :tab="tab"
         :editable="permissions.changeTitle && !isLocked"
         @edit="action('rename')"
       >
@@ -56,11 +56,9 @@
 
       <k-sections
         :blueprint="blueprint"
-        :columns="tab.columns"
         :empty="$t('page.blueprint', { template: blueprint })"
         :parent="$api.pages.url(page.id)"
         :tab="tab"
-        :tabs="tabs"
       />
 
       <k-page-rename-dialog ref="rename" @success="$reload" />

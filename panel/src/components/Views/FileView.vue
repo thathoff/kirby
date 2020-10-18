@@ -6,8 +6,8 @@
 
         <k-header
           :editable="permissions.changeName && !isLocked"
+          :tab="tab.name"
           :tabs="tabs"
-          :tab="tab"
           @edit="action('rename')"
         >
           {{ file.filename }}
@@ -43,11 +43,9 @@
 
         <k-sections
           :blueprint="blueprint"
-          :columns="tab.columns"
           :empty="$t('file.blueprint', { template: file.blueprint.name })"
           :parent="parent"
           :tab="tab"
-          :tabs="tabs"
         />
 
         <k-file-rename-dialog ref="rename" @success="onRename" />

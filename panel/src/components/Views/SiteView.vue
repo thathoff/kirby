@@ -3,7 +3,7 @@
     <k-view :data-locked="isLocked" class="k-site-view">
       <k-header
         :tabs="tabs"
-        :tab="tab"
+        :tab="tab.name"
         :editable="permissions.changeTitle && !isLocked"
         @edit="$refs.rename.open()"
         >
@@ -23,10 +23,8 @@
       </k-header>
       <k-sections
         :blueprint="blueprint"
-        :columns="tab.columns"
         :empty="$t('site.blueprint')"
         :tab="tab"
-        :tabs="tabs"
         parent="site"
       />
     </k-view>
