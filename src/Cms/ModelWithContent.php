@@ -631,7 +631,7 @@ abstract class ModelWithContent extends Model
         if ($languageCode !== $kirby->defaultLanguage()->code()) {
             foreach ($this->blueprint()->fields() as $field) {
                 if (($field['translate'] ?? true) === false) {
-                    $content[$field['name']] = null;
+                    $content[strtolower($field['name'])] = null;
                 }
             }
 

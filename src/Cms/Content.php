@@ -61,7 +61,7 @@ class Content
      */
     public function __construct(array $data = [], $parent = null)
     {
-        $this->data   = $data;
+        $this->update($data, true);
         $this->parent = $parent;
     }
 
@@ -161,9 +161,7 @@ class Content
             return $this->fields[$key];
         }
 
-        // fetch the value no matter the case
-        $data  = $this->data();
-        $value = $data[$key] ?? array_change_key_case($data)[$key] ?? null;
+        $value = $this->data()[$key] ?? null;
 
         return $this->fields[$key] = new Field($this->parent, $key, $value);
     }
@@ -176,10 +174,7 @@ class Content
      */
     public function has(string $key): bool
     {
-        $key  = strtolower($key);
-        $data = array_change_key_case($this->data);
-
-        return isset($data[$key]) === true;
+        return isset($this->data[strtolower($key)]) === true;
     }
 
     /**
@@ -206,7 +201,7 @@ class Content
         $copy->fields = null;
 
         foreach ($keys as $key) {
-            unset($copy->data[$key]);
+            unset($copy->data[strtolower($key)]);
         }
 
         return $copy;
@@ -256,7 +251,8 @@ class Content
      */
     public function update(array $content = null, bool $overwrite = false)
     {
-        $this->data = $overwrite === true ? (array)$content : array_merge($this->data, (array)$content);
+        $content = array_change_key_case((array)$content);
+        $this->data = $overwrite === true ? $content : array_merge($this->data, $content);
 
         // clear cache of Field objects
         $this->fields = [];
