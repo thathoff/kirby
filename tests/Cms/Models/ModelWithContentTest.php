@@ -164,4 +164,51 @@ class ModelWithContentTest extends TestCase
             ]
         ], $model->blueprints('menu'));
     }
+
+    public function testPanelImage()
+    {
+        $app = new App([
+            'site' => [
+                'files' => [
+                    ['filename' => 'test.jpg']
+                ]
+            ]
+        ]);
+
+        $model = $app->site()->files()->first();
+        $image = $app->site()->image('test.jpg');
+        $hash  = $image->mediaHash();
+
+        // cover disabled as default
+        $this->assertSame([
+            'ratio' => '3/2',
+            'back' => 'pattern',
+            'cover' => false,
+            'url' => '/media/site/' . $hash . '/test.jpg',
+            'cards' => [
+                'url' => 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw',
+                'srcset' => '/media/site/' . $hash . '/test-352x.jpg 352w, /media/site/' . $hash . '/test-864x.jpg 864w, /media/site/' . $hash . '/test-1408x.jpg 1408w'
+            ],
+            'list' => [
+                'url' => 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw',
+                'srcset' => '/media/site/' . $hash . '/test-38x.jpg 38w, /media/site/' . $hash . '/test-76x.jpg 76w'
+            ]
+        ], $model->panelImage());
+
+        // cover enabled
+        $this->assertSame([
+            'ratio' => '3/2',
+            'back' => 'pattern',
+            'cover' => true,
+            'url' => '/media/site/' . $hash . '/test.jpg',
+            'cards' => [
+                'url' => 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw',
+                'srcset' => '/media/site/' . $hash . '/test-352x.jpg 352w, /media/site/' . $hash . '/test-864x.jpg 864w, /media/site/' . $hash . '/test-1408x.jpg 1408w'
+            ],
+            'list' => [
+                'url' => 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw',
+                'srcset' => '/media/site/' . $hash . '/test-38x38.jpg 1x, /media/site/' . $hash . '/test-76x76.jpg 2x'
+            ]
+        ], $model->panelImage(['cover' => true]));
+    }
 }
