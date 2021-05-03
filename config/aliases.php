@@ -57,6 +57,10 @@ return [
     'str'        => 'Kirby\Toolkit\Str',
     'tpl'        => 'Kirby\Toolkit\Tpl',
     'v'          => 'Kirby\Toolkit\V',
-    'xml'        => 'Kirby\Toolkit\Xml'
+    'xml'        => 'Kirby\Toolkit\Xml',
+
+    // TODO: remove in 4.0.0
+    'kirby/cms/kirbytag'  => 'Kirby\Text\KirbyTag',
+    'kirby/cms/kirbytags' => 'Kirby\Text\KirbyTags'
 ];
 // @codeCoverageIgnoreEnd
