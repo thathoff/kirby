@@ -137,7 +137,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style>
 .k-fieldset {
   border: 0;
 }
@@ -145,7 +145,7 @@ export default {
   grid-row-gap: 2.25rem;
 }
 
-@media screen and (min-width: $breakpoint-sm) {
+@media screen and (min-width: 30em) {
   .k-fieldset .k-grid {
     grid-column-gap: 1.5rem;
   }
@@ -155,9 +155,10 @@ export default {
 .k-sections > .k-column[data-width="1/3"] .k-fieldset .k-grid,
 .k-sections > .k-column[data-width="1/4"] .k-fieldset .k-grid {
   grid-template-columns: repeat(1, 1fr);
+}
 
-  .k-column {
-    grid-column-start: initial;
-  }
+.k-sections > .k-column[data-width="1/3"] .k-fieldset .k-grid .k-column,
+.k-sections > .k-column[data-width="1/4"] .k-fieldset .k-grid .k-column {
+  grid-column-start: initial;
 }
 </style>

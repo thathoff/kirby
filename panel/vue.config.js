@@ -1,6 +1,5 @@
 /* eslint-env node */
 const path = require("path");
-const fs = require("fs");
 
 let custom;
 try {
@@ -13,16 +12,6 @@ const host = process.env.VUE_APP_DEV_SERVER || "http://sandbox.test";
 
 // vue.config.js
 module.exports = {
-  css: {
-    loaderOptions: {
-      sass: {
-        additionalData: fs.readFileSync(
-          "./src/main.scss",
-          "utf-8"
-        )
-      }
-    }
-  },
   lintOnSave: 'error',
   productionSourceMap: false,
   configureWebpack: () => {
